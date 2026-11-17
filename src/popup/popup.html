@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Tab Shelf</title>
+  <link rel="stylesheet" href="../ui/common.css">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <strong>Tab Shelf</strong>
+    <span class="spacer"></span>
+    <button id="open-manager" class="ghost" title="Open manager (Alt+Shift+M)">Manager</button>
+    <button id="open-options" class="ghost" title="Settings" aria-label="Settings">⚙</button>
+  </header>
+
+  <section class="save">
+    <label class="row">
+      <span class="muted">Save to</span>
+      <select id="group"></select>
+    </label>
+    <input type="text" id="newname" placeholder="New group name" hidden>
+    <div class="buttons">
+      <button id="save-tab" class="primary" title="Alt+Shift+S">Save this tab</button>
+      <button id="save-window" title="Alt+Shift+W">Save window</button>
+      <button id="save-all">Save all windows</button>
+    </div>
+    <label class="check"><input type="checkbox" id="close"> Close tabs after saving</label>
+  </section>
+
+  <section class="find">
+    <input type="search" id="q" placeholder="Search saved tabs…  (tag:x  group:x  site:x)" autocomplete="off">
+    <ul id="results"></ul>
+    <p id="empty" class="muted" hidden></p>
+  </section>
+
+  <footer class="muted" id="footer"></footer>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
