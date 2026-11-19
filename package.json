@@ -1,0 +1,16 @@
+{
+  "name": "tab-shelf",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Firefox extension to save tabs and sessions for later.",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "lint": "web-ext lint --source-dir src",
+    "start": "web-ext run --source-dir src --firefox=nightly",
+    "build": "web-ext build --source-dir src --artifacts-dir dist --overwrite-dest"
+  },
+  "devDependencies": {
+    "web-ext": "^8.3.0"
+  }
+}

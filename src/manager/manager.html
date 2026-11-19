@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tab Shelf</title>
+  <link rel="icon" href="../icons/icon.svg">
+  <link rel="stylesheet" href="../ui/common.css">
+  <link rel="stylesheet" href="manager.css">
+</head>
+<body>
+  <aside id="sidebar">
+    <div class="brand"><img src="../icons/icon.svg" alt="" width="20" height="20"> Tab Shelf</div>
+    <nav>
+      <button class="nav-item" id="nav-all" data-group="">All tabs <span class="count" id="count-all"></span></button>
+      <div class="nav-label">Groups <button class="ghost small" id="add-group" title="New group">＋</button></div>
+      <ul id="group-nav"></ul>
+      <div class="nav-label">Tags</div>
+      <div id="tag-cloud"></div>
+    </nav>
+    <div class="side-foot muted" id="sync-status"></div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <input type="search" id="q" placeholder="Search title, URL, tags…   tag:recipes  group:work  site:github  -exclude" autocomplete="off">
+      <div class="actions">
+        <button id="dupes" title="Find and remove duplicate tabs">Duplicates</button>
+        <button id="ai-tag" title="Tag untagged tabs with AI">AI tag</button>
+        <button id="import">Import</button>
+        <div class="menu-wrap">
+          <button id="export" aria-haspopup="true">Export ▾</button>
+          <div class="menu" id="export-menu" hidden>
+            <button data-format="json">Tab Shelf JSON (full backup)</button>
+            <button data-format="html">Bookmarks HTML (browsers)</button>
+            <button data-format="onetab">OneTab text</button>
+          </div>
+        </div>
+        <button id="settings" class="ghost" title="Settings" aria-label="Settings">⚙</button>
+      </div>
+    </div>
+
+    <div id="welcome" class="banner" hidden>
+      <div>
+        <strong>Welcome to Tab Shelf.</strong>
+        Save with the shelf icon in the address bar, the toolbar button, or the shortcuts:
+        <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> save tab ·
+        <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>W</kbd> save window ·
+        <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd> open this page ·
+        <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> popup.
+        Drag tabs between groups to organise. Add your OpenAI key in <a href="#" id="welcome-options">settings</a> for AI tags.
+      </div>
+      <button class="ghost" id="welcome-close" aria-label="Dismiss">✕</button>
+    </div>
+
+    <div id="selbar" class="selbar" hidden>
+      <span id="sel-count"></span>
+      <select id="sel-move" aria-label="Move selected to group"><option value="">Move to…</option></select>
+      <button id="sel-tag">Add tags</button>
+      <button id="sel-ai">AI tag</button>
+      <button id="sel-open">Open</button>
+      <button id="sel-delete" class="danger">Delete</button>
+      <span class="spacer"></span>
+      <button id="sel-clear" class="ghost">Clear selection</button>
+    </div>
+
+    <div id="content"></div>
+    <p id="nothing" class="muted empty" hidden></p>
+  </main>
+
+  <dialog id="import-dialog">
+    <form method="dialog" class="dlg">
+      <h2>Import</h2>
+      <p class="muted">Paste or pick a file: Tab Shelf JSON, bookmarks HTML (Firefox/Chrome export), OneTab text, or any list of URLs.</p>
+      <input type="file" id="import-file" accept=".json,.html,.htm,.txt,text/*,application/json">
+      <textarea id="import-text" rows="10" placeholder="…or paste here"></textarea>
+      <label class="check"><input type="checkbox" id="import-ai"> Tag imported tabs with AI</label>
+      <div class="dlg-buttons">
+        <button value="cancel">Cancel</button>
+        <button id="import-go" class="primary" value="default">Import</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dupes-dialog">
+    <form method="dialog" class="dlg">
+      <h2>Duplicates</h2>
+      <p class="muted" id="dupes-summary"></p>
+      <ul id="dupes-list"></ul>
+      <div class="dlg-buttons">
+        <button value="cancel">Close</button>
+        <button id="dupes-go" class="primary" value="default">Remove duplicates</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="tag-dialog">
+    <form method="dialog" class="dlg">
+      <h2>Add tags</h2>
+      <input type="text" id="tag-input" placeholder="comma, separated, tags">
+      <div class="dlg-buttons">
+        <button value="cancel">Cancel</button>
+        <button class="primary" value="default">Add</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="manager.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+main { max-width: 680px; margin: 0 auto; padding: 24px 16px 60px; }
+h1 { font-size: 22px; margin: 0 0 16px; }
+section {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px 16px; margin-bottom: 14px; display: grid; gap: 10px;
+}
+h2 { font-size: 15px; margin: 0; }
+p { margin: 0; }
+.check { display: flex; gap: 8px; align-items: center; }
+.field { display: grid; gap: 4px; font-weight: 500; }
+.field input, .field select { font-weight: 400; max-width: 100%; }
+.small { font-size: 12px; font-weight: 400; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+kbd { font: 11px ui-monospace, monospace; padding: 1px 4px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface-2); }
+.ok { color: var(--ok); }
+.err { color: var(--danger); }

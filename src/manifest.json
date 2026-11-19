@@ -1,0 +1,81 @@
+{
+  "manifest_version": 3,
+  "name": "Tab Shelf",
+  "version": "0.1.0",
+  "description": "Save tabs and sessions for later: groups, drag and drop, search, duplicate removal, Firefox Sync, import/export and AI tagging.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "tab-shelf@shredthagnar.github.io",
+      "strict_min_version": "128.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    }
+  },
+  "icons": {
+    "48": "icons/icon.svg",
+    "96": "icons/icon.svg"
+  },
+  "permissions": [
+    "tabs",
+    "storage",
+    "unlimitedStorage",
+    "menus"
+  ],
+  "optional_host_permissions": [
+    "https://*/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Tab Shelf",
+    "default_icon": "icons/icon.svg",
+    "default_popup": "popup/popup.html"
+  },
+  "page_action": {
+    "default_title": "Save tab to Tab Shelf",
+    "default_icon": "icons/save.svg",
+    "show_matches": [
+      "http://*/*",
+      "https://*/*"
+    ]
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+Shift+T"
+      },
+      "description": "Open the Tab Shelf popup"
+    },
+    "save-tab": {
+      "suggested_key": {
+        "default": "Alt+Shift+S"
+      },
+      "description": "Save the current tab (or selected tabs)"
+    },
+    "save-window": {
+      "suggested_key": {
+        "default": "Alt+Shift+W"
+      },
+      "description": "Save all tabs in this window as a session"
+    },
+    "open-manager": {
+      "suggested_key": {
+        "default": "Alt+Shift+M"
+      },
+      "description": "Open the Tab Shelf manager"
+    }
+  }
+}

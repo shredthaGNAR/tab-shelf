@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tab Shelf settings</title>
+  <link rel="icon" href="../icons/icon.svg">
+  <link rel="stylesheet" href="../ui/common.css">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <main>
+    <h1>Tab Shelf settings</h1>
+
+    <section>
+      <h2>Saving</h2>
+      <label class="check"><input type="checkbox" id="closeAfterSave"> Close tabs after saving them</label>
+      <label class="check"><input type="checkbox" id="skipDuplicates"> Skip tabs that are already saved (duplicate protection)</label>
+      <label class="field">Default group for quick saves
+        <select id="defaultGroupId"></select>
+      </label>
+    </section>
+
+    <section>
+      <h2>Restoring</h2>
+      <label class="check"><input type="checkbox" id="restoreInNewWindow"> Open groups in a new window</label>
+      <label class="check"><input type="checkbox" id="removeOnRestore"> Remove tabs from the shelf when they are opened</label>
+    </section>
+
+    <section>
+      <h2>Sync</h2>
+      <label class="check"><input type="checkbox" id="syncEnabled"> Sync with Firefox Sync</label>
+      <p class="muted">Uses your Firefox account. Make sure <em>Add-ons</em> is ticked under Settings › Sync on each device.
+        Firefox Sync gives extensions about 100 KB, which holds roughly 600 to 1,500 tabs. If you save more, the most recently changed ones
+        sync and the rest stay safe on this device. Favicons are not synced.</p>
+      <div class="row"><button id="syncNow">Sync now</button> <span id="syncStatus" class="muted"></span></div>
+    </section>
+
+    <section>
+      <h2>AI tagging</h2>
+      <p class="muted">Tabs are tagged by an OpenAI-compatible chat API using your own key. Only each tab's title and URL are sent.
+        The key is stored on this device only. It is never synced or exported.</p>
+      <label class="field">API key
+        <input type="password" id="apiKey" placeholder="sk-…" autocomplete="off" spellcheck="false">
+      </label>
+      <label class="field">Model
+        <input type="text" id="model" spellcheck="false">
+      </label>
+      <label class="field">API base URL
+        <input type="url" id="baseUrl" spellcheck="false">
+        <span class="muted small">Change this for another OpenAI-compatible service (OpenRouter, a local Ollama or LM Studio server, Azure, …).</span>
+      </label>
+      <label class="field">Tags per tab
+        <select id="maxTags"><option>2</option><option>3</option><option>4</option><option>5</option></select>
+      </label>
+      <label class="check"><input type="checkbox" id="autoTag"> Automatically tag tabs when they are saved</label>
+      <div class="row">
+        <button id="saveAi" class="primary">Save AI settings</button>
+        <button id="testAi">Test</button>
+        <span id="aiStatus" class="muted"></span>
+      </div>
+    </section>
+
+    <section>
+      <h2>Appearance & shortcuts</h2>
+      <label class="field">Theme
+        <select id="theme"><option value="auto">Match Firefox</option><option value="light">Light</option><option value="dark">Dark</option></select>
+      </label>
+      <p class="muted">Default shortcuts: <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> save tab, <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>W</kbd> save window,
+        <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd> manager, <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> popup.
+        Change them in <code>about:addons</code> › ⚙ › Manage Extension Shortcuts.</p>
+    </section>
+  </main>
+  <script type="module" src="options.js"></script>
+</body>
+</html>
