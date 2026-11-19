@@ -2,6 +2,8 @@
 
 A Firefox (Nightly-friendly, Manifest V3) extension for saving tabs and whole sessions for later.
 
+**Website:** https://shredthagnar.github.io/tab-shelf/
+
 - **Groups.** Save into any group, or save a whole window as a dated "Session" group. Rename, recolour, reorder (drag in the sidebar), restore or delete groups.
 - **Drag and drop.** Drag saved tabs between groups, onto a group in the sidebar, or above another tab to reorder. Select several (Shift-click for a range) and drag them together. You can also drag a link or tab from Firefox onto a group to save it.
 - **Find things fast.** Search title, URL, notes, tags and group names. Filters: `tag:recipes`, `#recipes`, `group:work`, `site:github`, `-exclude`, `"exact phrase"`. Tag cloud in the sidebar. Press `/` to jump to search.
@@ -74,6 +76,10 @@ src/
 ```
 
 Only the background script writes state. Pages send it messages and re-render on `storage.onChanged`.
+
+## Website
+
+The project site lives in `site/` (Astro) and deploys to GitHub Pages from `.github/workflows/site.yml`. See `site/README.md`.
 
 ## Publishing note
 
