@@ -1,0 +1,38 @@
+---
+import Base from "../layouts/Base.astro";
+const repo = "https://github.com/shredthaGNAR/tab-shelf";
+---
+<Base title="Privacy · Tab Shelf" description="What Tab Shelf stores, what it syncs and what it sends, in plain words.">
+  <article class="wrap prose">
+    <span class="eyebrow">Privacy</span>
+    <h1>Your tabs stay yours.</h1>
+    <p class="lede">Tab Shelf has no server, no account and no analytics. This page explains exactly where your data goes.</p>
+
+    <h2>What is stored</h2>
+    <p>The tabs you save (title, URL, favicon, tags, notes and when you saved them), your groups, and your settings. All of it lives in the extension's storage inside your Firefox profile.</p>
+
+    <h2>What is synced</h2>
+    <p>If you use Firefox Sync with <strong>Add-ons</strong> ticked, Tab Shelf puts a compact copy of your groups and tabs (without favicons) into Firefox's extension sync storage. Mozilla carries it between your devices, encrypted with your Firefox account, the same way it syncs other add-on data. Tab Shelf never sees your Firefox account.</p>
+
+    <h2>What is sent to an AI service</h2>
+    <p>Nothing, unless you add an API key. If you do, the title and URL of the tabs being tagged, plus your existing tag names, are sent to the API base URL you entered (OpenAI by default). That service's own privacy policy then applies. If you point it at a local model such as Ollama or LM Studio, nothing leaves your computer.</p>
+    <p>Your API key is kept in local storage on that device. It is not synced and not included in exports.</p>
+
+    <h2>What is not collected</h2>
+    <p>No telemetry, no analytics, no crash reporting, no ads. The only network requests Tab Shelf makes are the AI calls you set up and loading each saved tab's favicon from the site it came from (sent without a referrer). This website has no cookies or trackers either.</p>
+
+    <h2>Removing your data</h2>
+    <p>Export a backup if you want one, then remove the extension from <code>about:addons</code>. Firefox deletes its local storage with it. Synced data is cleared when you remove it from your other devices.</p>
+
+    <p class="small">Questions? <a href={`${repo}/issues`}>Open an issue on GitHub.</a> The full source is at <a href={repo}>{repo.replace("https://", "")}</a>.</p>
+  </article>
+</Base>
+
+<style>
+  .prose { max-width: 720px; padding: 72px 0 96px; }
+  h1 { font-size: clamp(38px, 6vw, 60px); font-weight: 750; letter-spacing: -0.03em; }
+  h2 { font-size: 24px; margin: 40px 0 10px; }
+  p + p { margin-top: 12px; }
+  .prose > p:not(.lede) { color: var(--muted); }
+  .small { margin-top: 48px; font-size: 15px; }
+</style>

@@ -1,0 +1,476 @@
+---
+import Base from "../layouts/Base.astro";
+import Shot from "../components/Shot.astro";
+import managerLight from "../assets/shots/manager-light.png";
+import managerDark from "../assets/shots/manager-dark.png";
+import popupLight from "../assets/shots/popup-light.png";
+import popupDark from "../assets/shots/popup-dark.png";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const repo = "https://github.com/shredthaGNAR/tab-shelf";
+
+// Icon paths are 24x24, stroke-based.
+const features = [
+  {
+    title: "Groups and sessions",
+    body: "Save into any group, or save a whole window as a dated session. Rename, recolour, reorder, restore or clear a group in one click.",
+    color: "var(--blue)",
+    icon: "M4 6h16M4 12h16M4 18h10",
+  },
+  {
+    title: "Drag and drop",
+    body: "Drag saved tabs between groups, onto a group in the sidebar, or above another tab to reorder. Shift-click to move many at once. Drop a link from Firefox to save it.",
+    color: "var(--violet)",
+    icon: "M9 4v16M15 4v16M4 9h16M4 15h16",
+  },
+  {
+    title: "Search that keeps up",
+    body: "Searches titles, URLs, notes, tags and group names as you type. Press / anywhere in the manager to jump to the search box.",
+    color: "var(--green)",
+    icon: "M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zM20 20l-4-4",
+  },
+  {
+    title: "No more duplicates",
+    body: "Saving a page you already have is skipped, even when the URL differs by tracking params, www., a #fragment or a trailing slash. One button cleans up old ones and merges their tags.",
+    color: "var(--red)",
+    icon: "M8 8h11v11H8zM5 16V5h11",
+  },
+  {
+    title: "Address bar icon",
+    body: "A shelf icon in the urlbar saves the page in one click. It turns blue when the page is already saved, and then takes you straight to it.",
+    color: "var(--amber)",
+    icon: "M6 3h12v18l-6-4-6 4z",
+  },
+  {
+    title: "AI tagging",
+    body: "Tag tabs automatically with any OpenAI-compatible model, using your own key. It reuses your existing tags so the vocabulary stays tidy.",
+    color: "var(--violet)",
+    icon: "M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z",
+  },
+  {
+    title: "Firefox Sync",
+    body: "Rides on your Firefox account through storage.sync. No extra server and no extra sign-in. Edits merge per tab, so two devices never clobber each other.",
+    color: "var(--blue)",
+    icon: "M20 12a8 8 0 0 1-14 5.3M4 12a8 8 0 0 1 14-5.3M18 3v4h-4M6 21v-4h4",
+  },
+  {
+    title: "Import and export",
+    body: "Full JSON backups, bookmarks HTML that any browser understands, OneTab lists, or a plain pasted list of URLs.",
+    color: "var(--green)",
+    icon: "M12 4v11M7 10l5 5 5-5M5 20h14",
+  },
+  {
+    title: "Right-click to save",
+    body: "Context menus on pages, links and tabs, so saving never means switching to the tab first.",
+    color: "var(--red)",
+    icon: "M5 4l14 7-6 2-2 6z",
+  },
+];
+
+const shortcuts = [
+  { keys: ["Alt", "Shift", "S"], what: "Save the current tab, or every selected tab" },
+  { keys: ["Alt", "Shift", "W"], what: "Save the whole window as a session" },
+  { keys: ["Alt", "Shift", "M"], what: "Open the manager" },
+  { keys: ["Alt", "Shift", "T"], what: "Open the popup" },
+  { keys: ["/"], what: "Jump to search (in the manager)" },
+];
+
+const filters = [
+  { q: "tag:recipes", or: "#recipes", what: "Tabs with that tag" },
+  { q: "group:work", what: "Tabs in a group whose name matches" },
+  { q: "site:github", what: "Tabs from a site" },
+  { q: "-youtube", what: "Leave out anything matching" },
+  { q: '"exact phrase"', what: "Match the words together" },
+];
+
+const faqs = [
+  {
+    q: "Does it work in regular Firefox, not just Nightly?",
+    a: "Yes. It needs Firefox 128 or newer. Nightly and Developer Edition can install the unsigned build directly. Release Firefox needs a signed copy from addons.mozilla.org, or a temporary install from about:debugging.",
+  },
+  {
+    q: "How many tabs can it sync?",
+    a: "Firefox gives each extension about 100 KB of sync space, which holds roughly 600 to 1,500 tabs depending on URL and title length. Past that, titles are shortened first, then only the most recently changed tabs sync. Everything is still kept on the device that saved it, and the sidebar footer tells you how many fit.",
+  },
+  {
+    q: "What does AI tagging send, and where?",
+    a: "Only each tab's title and URL, 20 tabs per request, plus your existing tag names so the model reuses them. It goes to the API base URL you set, and nowhere else. AI tagging is off until you add a key.",
+  },
+  {
+    q: "Can I use something other than OpenAI?",
+    a: "Yes. Any OpenAI-compatible chat API works: OpenRouter, Azure OpenAI, or a model running on your own machine with Ollama or LM Studio. Set the API base URL and model name in settings.",
+  },
+  {
+    q: "Where is my API key stored?",
+    a: "In the extension's local storage on that one device. It is never synced, never included in exports, and never leaves your machine except to authenticate with the API you chose.",
+  },
+  {
+    q: "I can't see the address bar icon.",
+    a: "Firefox sometimes tucks new page actions into the … menu at the end of the address bar. Open it, right-click Tab Shelf, and choose Pin to Address Bar.",
+  },
+];
+---
+<Base
+  title="Tab Shelf: save tabs and sessions for later in Firefox"
+  description="A free Firefox extension that saves tabs and whole sessions into groups, removes duplicates, syncs with your Firefox account and tags everything with AI."
+>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <span class="pill"><span class="dot"></span> Free · Firefox 128+ · Made for Nightly</span>
+        <h1>Close tabs <em>without</em> losing them.</h1>
+        <p class="lede">
+          Tab Shelf saves tabs and whole windows into groups you can search, sort and sync.
+          One click in the address bar, one keyboard shortcut, and your tab bar is clear again.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#install">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Install for Firefox
+          </a>
+          <a class="btn btn-ghost" href={repo}>View source on GitHub</a>
+        </div>
+        <p class="hint">Press <kbd>Alt</kbd>&nbsp;<kbd>Shift</kbd>&nbsp;<kbd>S</kbd> to shelve a tab.</p>
+      </div>
+    </div>
+    <div class="wrap stage">
+      <div class="window">
+        <div class="chrome" aria-hidden="true">
+          <span></span><span></span><span></span>
+          <div class="urlbar">
+            <span>moz-extension://tab-shelf/manager.html</span>
+            <svg viewBox="0 0 16 16" width="16" height="16"><path d="M3.5 1.5h9a1 1 0 0 1 1 1v12l-5.5-3.5-5.5 3.5v-12a1 1 0 0 1 1-1z" fill="#5b8def"/><path d="M5.8 6.6l1.6 1.6 3-3" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+        <Shot light={managerLight} dark={managerDark} width={1100} loading="eager"
+          alt="The Tab Shelf manager: a sidebar of coloured groups and a tag cloud, next to saved tabs grouped under Inbox and Work, each with tags." />
+      </div>
+      <div class="popup">
+        <Shot light={popupLight} dark={popupDark} width={300} loading="eager"
+          alt="The Tab Shelf popup with buttons to save this tab, the window or all windows, and a search box above saved tabs." />
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="features">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Features</span>
+        <h2>Everything a tab hoarder needs.<br />Nothing they don't.</h2>
+      </div>
+      <ul class="grid">
+        {features.map((f) => (
+          <li class="card">
+            <span class="icon" style={`--c:${f.color}`}>
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                <path d={f.icon} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <h3>{f.title}</h3>
+            <p>{f.body}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Search -->
+  <section class="search-sec">
+    <div class="wrap split">
+      <div>
+        <span class="eyebrow">Find it again</span>
+        <h2>Search like you think.</h2>
+        <p class="lede">
+          Type a few words, or narrow it down with filters. Mix them freely: every filter has to match.
+        </p>
+      </div>
+      <div class="searchbox-demo">
+        <div class="fake-search" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zM20 20l-4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span>pasta</span><span class="tok t1">tag:recipes</span><span class="tok t2">-youtube</span><span class="caret"></span>
+        </div>
+        <table class="filters">
+          <tbody>
+            {filters.map((f) => (
+              <tr>
+                <td><code>{f.q}</code>{f.or && <> <span class="muted">or</span> <code>{f.or}</code></>}</td>
+                <td>{f.what}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Shortcuts -->
+  <section id="shortcuts" class="shortcuts">
+    <div class="wrap split">
+      <div>
+        <span class="eyebrow">Keyboard first</span>
+        <h2>Save without reaching for the mouse.</h2>
+        <p class="lede">
+          Every shortcut can be changed at <code>about:addons</code> › ⚙ › <em>Manage Extension Shortcuts</em>.
+        </p>
+      </div>
+      <ul class="keys">
+        {shortcuts.map((s) => (
+          <li>
+            <span class="combo">{s.keys.map((k, i) => <>{i > 0 && <span class="plus">+</span>}<kbd>{k}</kbd></>)}</span>
+            <span>{s.what}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Sync and AI -->
+  <section class="trust">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Your data, your rules</span>
+        <h2>No account. No server. No tracking.</h2>
+        <p class="lede">Tab Shelf has no backend of its own. Your tabs live in Firefox, and the only thing that ever leaves it is what you choose to send.</p>
+      </div>
+      <div class="duo">
+        <article class="panel">
+          <h3>Sync through Firefox</h3>
+          <p>Tab Shelf keeps everything locally and mirrors a compact copy into Firefox's own sync storage. Sign in to Firefox, tick <strong>Add-ons</strong> under Settings › Sync on each device, and your shelf follows you.</p>
+          <ul class="ticks">
+            <li>Changes merge tab by tab; the newest edit wins</li>
+            <li>Deleted tabs stay deleted on every device</li>
+            <li>Room for roughly 600 to 1,500 tabs</li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h3>AI tags with your own key</h3>
+          <p>Paste an OpenAI API key in settings, then tag a whole group on demand or switch on auto-tagging so new tabs are tagged as you save them. Default model is <code>gpt-5-mini</code>.</p>
+          <ul class="ticks">
+            <li>Only titles and URLs are sent</li>
+            <li>Key stays on this device: never synced or exported</li>
+            <li>Works with OpenRouter, Azure, Ollama or LM Studio</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Install -->
+  <section id="install" class="install">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Install</span>
+        <h2>Up and running in a minute.</h2>
+        <p class="lede">Tab Shelf is not on addons.mozilla.org yet, so it installs from a file. Nightly and Developer Edition can keep it installed; release Firefox can try it until the next restart.</p>
+      </div>
+      <ol class="steps">
+        <li>
+          <h3>Allow unsigned add-ons</h3>
+          <p>In Firefox Nightly or Developer Edition, open <code>about:config</code> and set <code>xpinstall.signatures.required</code> to <code>false</code>.</p>
+        </li>
+        <li>
+          <h3>Download Tab Shelf</h3>
+          <p>Get the latest build, made from the <code>main</code> branch every time it changes.</p>
+          <a class="btn btn-primary small" href={`${base}/tab-shelf.xpi`} download>Download tab-shelf.xpi</a>
+        </li>
+        <li>
+          <h3>Install from file</h3>
+          <p>Open <code>about:addons</code>, click ⚙ › <em>Install Add-on From File…</em> and pick the file you downloaded.</p>
+        </li>
+        <li>
+          <h3>Pin the icon</h3>
+          <p>If the shelf icon hides in the address bar's … menu, right-click it and choose <em>Pin to Address Bar</em>.</p>
+        </li>
+      </ol>
+      <div class="alt-install">
+        <details>
+          <summary>Just trying it out in release Firefox?</summary>
+          <p>Open <code>about:debugging#/runtime/this-firefox</code>, click <em>Load Temporary Add-on…</em> and pick the downloaded file. It stays until Firefox restarts.</p>
+        </details>
+        <details>
+          <summary>Building from source</summary>
+          <pre><code>git clone {repo}.git
+cd tab-shelf
+npm install
+npm start        # runs Firefox Nightly with the extension loaded
+npm run build    # makes dist/tab_shelf-*.zip</code></pre>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq">
+    <div class="wrap faq-grid">
+      <div>
+        <span class="eyebrow">FAQ</span>
+        <h2>Questions, answered.</h2>
+        <p class="lede">Something else? <a href={`${repo}/issues`}>Open an issue on GitHub.</a></p>
+      </div>
+      <div class="qa">
+        {faqs.map((f) => (
+          <details>
+            <summary>{f.q}</summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="closer">
+    <div class="wrap closer-inner">
+      <div class="bars" aria-hidden="true"><span></span><span></span><span></span></div>
+      <h2>Give your tab bar a break.</h2>
+      <div class="cta">
+        <a class="btn btn-primary" href="#install">Install Tab Shelf</a>
+        <a class="btn btn-ghost" href={repo}>Star on GitHub</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .muted { color: var(--muted); }
+
+  /* Hero */
+  .hero { padding: 72px 0 40px; position: relative; isolation: isolate; }
+  .hero::before {
+    content: ""; position: absolute; inset: -64px 0 auto; height: 720px; z-index: -1;
+    background:
+      radial-gradient(40% 50% at 15% 20%, color-mix(in srgb, var(--blue) 18%, transparent), transparent 70%),
+      radial-gradient(35% 45% at 85% 10%, color-mix(in srgb, var(--amber) 16%, transparent), transparent 70%),
+      radial-gradient(40% 50% at 60% 60%, color-mix(in srgb, var(--green) 12%, transparent), transparent 70%);
+  }
+  .hero-copy { max-width: 760px; margin-inline: auto; text-align: center; }
+  .hero-copy .lede { margin-inline: auto; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--border); font-size: 14px; color: var(--muted);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 25%, transparent); }
+  h1 { font-size: clamp(42px, 8vw, 84px); font-weight: 750; margin-top: 22px; letter-spacing: -0.035em; line-height: 1; }
+  h1 em { font-style: normal; color: var(--accent); }
+  .cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
+  .hint { margin-top: 18px; color: var(--muted); font-size: 15px; }
+
+  .stage { position: relative; margin-top: 56px; padding-bottom: 40px; }
+  .window {
+    max-width: 1100px; margin-inline: auto; border-radius: var(--radius); overflow: hidden;
+    border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow);
+  }
+  .chrome { display: flex; align-items: center; gap: 7px; padding: 10px 14px; background: var(--bg-2); border-bottom: 1px solid var(--border); }
+  .chrome > span { width: 11px; height: 11px; border-radius: 50%; background: var(--border); }
+  .urlbar {
+    flex: 1; display: flex; align-items: center; justify-content: space-between; margin-left: 12px;
+    max-width: 560px; padding: 6px 12px; border-radius: 8px; background: var(--surface);
+    font: 13px/1 var(--mono); color: var(--muted); overflow: hidden; white-space: nowrap;
+  }
+  .popup {
+    position: absolute; right: max(0px, calc(50% - 600px)); bottom: 0; width: 300px;
+    border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow);
+    background: var(--surface);
+  }
+  @media (max-width: 860px) {
+    .popup { position: static; margin: 20px auto 0; }
+    .stage { padding-bottom: 0; }
+    .urlbar span { overflow: hidden; text-overflow: ellipsis; }
+  }
+
+  /* Features */
+  .features { background: var(--bg-2); border-block: 1px solid var(--border); }
+  .grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; }
+  .card h3 { margin: 18px 0 8px; }
+  .card p { color: var(--muted); font-size: 16px; }
+  .icon {
+    display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 12px;
+    color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent);
+  }
+
+  /* Split sections */
+  .split { display: grid; grid-template-columns: 1fr 1.1fr; gap: 56px; align-items: center; }
+  @media (max-width: 860px) { .split { grid-template-columns: 1fr; gap: 32px; } }
+
+  .fake-search {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 14px 18px;
+    background: var(--surface); border: 2px solid var(--accent); border-radius: 12px;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent); font-size: 17px; color: var(--muted);
+  }
+  .fake-search > span:not(.tok):not(.caret) { color: var(--text); }
+  .tok { font: 15px/1 var(--mono); padding: 5px 8px; border-radius: 6px; }
+  .t1 { background: color-mix(in srgb, var(--green) 18%, transparent); color: var(--text); }
+  .t2 { background: color-mix(in srgb, var(--red) 16%, transparent); color: var(--text); }
+  .caret { width: 2px; height: 20px; background: var(--accent); animation: blink 1.1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .caret { animation: none; } }
+  .filters { width: 100%; border-collapse: collapse; margin-top: 18px; font-size: 16px; }
+  .filters td { padding: 12px 4px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .filters td:first-child { white-space: nowrap; padding-right: 20px; }
+  .filters td:last-child { color: var(--muted); }
+  @media (max-width: 480px) { .filters td:first-child { white-space: normal; } }
+
+  .shortcuts { background: var(--bg-2); border-block: 1px solid var(--border); }
+  .keys { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .keys li {
+    display: flex; align-items: center; gap: 18px; padding: 14px 18px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; color: var(--muted);
+  }
+  .combo { display: inline-flex; align-items: center; gap: 4px; min-width: 170px; }
+  .combo kbd { font-size: 14px; padding: 4px 8px; color: var(--text); }
+  .plus { color: var(--muted); font-size: 13px; }
+  @media (max-width: 480px) { .keys li { flex-direction: column; align-items: flex-start; gap: 8px; } }
+
+  /* Trust */
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 760px) { .duo { grid-template-columns: 1fr; } }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; }
+  .panel h3 { font-size: 24px; margin-bottom: 12px; }
+  .panel > p { color: var(--muted); }
+  .ticks { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 10px; }
+  .ticks li { position: relative; padding-left: 30px; }
+  .ticks li::before {
+    content: ""; position: absolute; left: 0; top: 4px; width: 18px; height: 18px; border-radius: 50%;
+    background: color-mix(in srgb, var(--green) 20%, transparent)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.2l2.2 2.2 4.8-4.8' fill='none' stroke='%2330a46c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 14px no-repeat;
+  }
+
+  /* Install */
+  .install { background: var(--bg-2); border-block: 1px solid var(--border); }
+  .steps { list-style: none; counter-reset: step; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .steps li { counter-increment: step; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; }
+  .steps li::before {
+    content: counter(step); display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+    background: var(--text); color: var(--bg); font: 700 16px/1 var(--display); margin-bottom: 16px;
+  }
+  .steps h3 { margin-bottom: 8px; }
+  .steps p { color: var(--muted); font-size: 16px; }
+  .btn.small { padding: 10px 16px; font-size: 15px; margin-top: 16px; }
+  .alt-install { display: grid; gap: 12px; margin-top: 24px; }
+  pre { margin: 14px 0 0; padding: 16px 18px; background: var(--code-bg); border-radius: 10px; overflow-x: auto; font-size: 14px; line-height: 1.6; }
+  pre code { background: none; padding: 0; }
+
+  details { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0 20px; }
+  summary { cursor: pointer; padding: 18px 0; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font: 400 24px/1 var(--body); color: var(--muted); transition: transform 0.2s; }
+  details[open] summary::after { transform: rotate(45deg); }
+  details > p, details > pre { margin-bottom: 18px; }
+  details > p { color: var(--muted); }
+
+  /* FAQ */
+  .faq-grid { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 56px; align-items: start; }
+  @media (max-width: 860px) { .faq-grid { grid-template-columns: 1fr; gap: 32px; } }
+  .qa { display: grid; gap: 10px; }
+
+  /* Closer */
+  .closer { text-align: center; padding-top: 40px; }
+  .closer-inner { display: grid; justify-items: center; gap: 8px; }
+  .bars { display: grid; gap: 6px; width: 64px; margin-bottom: 20px; }
+  .bars span { height: 14px; border-radius: 5px; }
+  .bars span:nth-child(1) { background: var(--blue); }
+  .bars span:nth-child(2) { background: var(--green); }
+  .bars span:nth-child(3) { background: var(--amber); }
+</style>

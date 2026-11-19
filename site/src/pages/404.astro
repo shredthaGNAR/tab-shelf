@@ -1,0 +1,16 @@
+---
+import Base from "../layouts/Base.astro";
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+---
+<Base title="Not found · Tab Shelf" description="This page isn't on the shelf.">
+  <div class="wrap nf">
+    <h1>Not on the shelf.</h1>
+    <p>That page doesn't exist. Maybe it was closed without saving.</p>
+    <a class="btn btn-primary" href={`${base}/`}>Back to Tab Shelf</a>
+  </div>
+</Base>
+<style>
+  .nf { text-align: center; padding: 120px 0; display: grid; justify-items: center; gap: 18px; }
+  h1 { font-size: clamp(38px, 6vw, 64px); font-weight: 750; }
+  p { color: var(--muted); }
+</style>
